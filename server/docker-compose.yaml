@@ -1,0 +1,21 @@
+services:
+  server:
+    build: .
+    networks:
+      - traefik-proxy
+      - default
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pizza-http.rule=Host(`pizza.dominik-korsa.tk`)
+      - traefik.http.routers.pizza-http.entrypoints=http
+      - traefik.http.routers.pizza-http.middlewares=redirect
+      - traefik.http.routers.pizza-https.rule=Host(`pizza.dominik-korsa.tk`)
+      - traefik.http.routers.pizza-https.entrypoints=https
+      - traefik.http.routers.pizza-https.tls=true
+      - traefik.http.routers.pizza-https.tls.certresolver=letsencrypt
+      - traefik.http.services.pizza-backend.loadbalancer.server.port=80
+      - traefik.http.middlewares.redirect.redirectscheme.scheme=https
+networks:
+  traefik-proxy:
+    external: true
+    name: traefik-proxy
