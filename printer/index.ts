@@ -1,6 +1,8 @@
+import {connectWebsocket} from "./sockets";
+
 const {openDevice, printer, printQrImage} = require("./wrapper");
 
-interface ReceiptData {
+export interface ReceiptData {
     date: string;
     personName: string;
     pricePerPiece: string;
@@ -57,8 +59,21 @@ async function printReceipt(data: ReceiptData) {
         .text(data.account)
         .feed(2);
     await printer.close();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    process.exit(0);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    printer.beep(0, 0);
 }
 
-printReceipt({}).catch(console.error);
+async function main() {
+    const channel = await connectWebsocket();
+    console.log('WebSocket connected');
+    for await (const msg of channel) {
+        await printReceipt(msg);
+        console.log('Printed');
+    }
+}
+
+main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+})
+
