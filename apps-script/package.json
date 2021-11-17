@@ -1,0 +1,15 @@
+{
+  "name": "pizza-apps-script",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/Kod.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@types/google-apps-script": "^1.0.41",
+    "@types/lodash": "^4.14.177"
+  }
+}

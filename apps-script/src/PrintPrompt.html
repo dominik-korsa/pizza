@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <base target="_top">
+    <script>
+      function onFailure(error) {
+        console.error(error);
+        alert(error);
+      }
+
+      function printPerson(i, stringified) {
+        const data = JSON.parse(decodeURIComponent(stringified));
+        google.script.run.withFailureHandler(onFailure).onPersonPrint(data);
+        document.getElementById(`check-${i}`).classList.add('check--visible');
+      }
+    </script>
+    <style>
+      .items {
+        font-family: sans-serif;
+      }
+
+      .item {
+        display: flex;
+        align-items: baseline;
+        padding: 4px 0;
+      }
+
+      .item .name {
+        flex-grow: 1;
+      }
+
+      .check {
+        margin-right: 4px;
+      }
+
+      .check:not(.check--visible) {
+        visibility: hidden;
+      }
+
+      .item button {
+        padding: 8px 16px;
+        background: #0B5CAD;
+        color: white;
+        font-family: sans-serif;
+        border-radius: 3px;
+        cursor: pointer;
+        border: none;
+      }
+
+      .item button:hover {
+        background: #094D92;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="items">
+      <? for (var i = 0; i < people.length; i++) { ?>
+        <div class="item">
+          <div class="name"><?= people[i].personName ?></div>
+          <div class="check" id="check-<?=i?>">✔️</div>
+          <button onclick="printPerson(<?=i?>, <?=encodeURIComponent(JSON.stringify({...people[i], ...sheetData}))?>)">
+            Print
+          </button>
+        </div>
+      <? } ?>
+    </div>
+  </body>
+</html>

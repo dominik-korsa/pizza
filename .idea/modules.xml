@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/pizza-printer.iml" filepath="$PROJECT_DIR$/.idea/pizza-printer.iml" />
-      <module fileurl="file://$PROJECT_DIR$/server/pizza-server.iml" filepath="$PROJECT_DIR$/server/pizza-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apps-script/apps-script.iml" filepath="$PROJECT_DIR$/apps-script/apps-script.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/printer.iml" filepath="$PROJECT_DIR$/.idea/printer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/server/server.iml" filepath="$PROJECT_DIR$/server/server.iml" />
     </modules>
   </component>
 </project>
