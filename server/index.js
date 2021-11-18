@@ -9,6 +9,8 @@ fastify.post('/request-print', async (request, reply) => {
     reply.status(200).send();
 });
 
+fastify.get('/is-connected', async () => sockets.size > 0);
+
 const sockets = new Set();
 
 fastify.get('/ws', { websocket: true }, (connection) => {
