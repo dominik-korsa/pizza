@@ -9,12 +9,7 @@ const _ = LodashGS.load();
 const printRequestUrl = 'https://pizza.dominik-korsa.tk/request-print';
 
 const positions = {
-  qrContentTemplate: 'M3',
-  date: 'K15',
-  pricePerPiece: 'K13',
-  receiver: 'K16',
-  account: 'K17',
-  phone: 'K18'
+  qrContentTemplate: 'N3',
 };
 const cannotCalculateText = 'Nie można obliczyć';
 
@@ -47,14 +42,30 @@ function findColumns<T extends Record<string, string>>(range: Range, columns: T)
   }));
 }
 
+type RowsMap<T extends object> = {
+  [key in keyof T]: Range;
+}
+function findRows<T extends Record<string, string>>(range: Range, rows: T): RowsMap<T> {
+  const map = new Map<string, number>();
+  range.getValues().forEach(([header], rowIndex) => {
+    map.set(_.kebabCase(header), rowIndex + 1);
+  });
+  return _.mapValues(rows, (header => {
+    const row = map.get(_.kebabCase(header));
+    if (row === undefined) throw new Error(`Header ${header} not found`);
+    return range.getCell(row, 2);
+  }));
+}
+
 function listPeople(sheet: Sheet): ReceiptDataPerson[] {
-  const columns = findColumns(sheet.getRange('A1:E1'), {
+  const columns = findColumns(sheet.getRange('A1:H1'), {
     name: 'Kto? Kto będzie jadł?',
     pieces: 'Kawałki',
+    piecesPrice: 'Cena kawałków',
     totalPrice: 'Do zapłaty',
   });
-  const range = sheet.getRange("A2:E");
-  const people = [];
+  const range = sheet.getRange("A2:H");
+  const people: ReceiptDataPerson[] = [];
   for (let i = 2; i <= range.getHeight(); ++i) {
     const personName = range.getCell(i, columns.name).getDisplayValue();
     if (personName !== '') {
@@ -62,6 +73,7 @@ function listPeople(sheet: Sheet): ReceiptDataPerson[] {
       people.push({
         personName,
         pieces: range.getCell(i, columns.pieces).getValue(),
+        piecesPrice: range.getCell(i, columns.piecesPrice).getDisplayValue(),
         totalPrice: totalPriceCell.getDisplayValue(),
         qrContent: sheet.getRange(positions.qrContentTemplate).getValue().replace('{price}', zeroPad(Math.round(totalPriceCell.getValue() * 100), 6))
       });
@@ -71,20 +83,31 @@ function listPeople(sheet: Sheet): ReceiptDataPerson[] {
 }
 
 function getCommonData(sheet: Sheet): ReceiptDataCommon {
+  const range = sheet.getRange('K1:L');
+  const rows = findRows(range, {
+    pricePerPiece: 'Cena za kawałek',
+    servicePrice: 'Cena na osobę',
+    receiver: 'Odbiorca',
+    account: 'Konto bankowe',
+    phone: 'Numer telefonu',
+    date: 'Data',
+  });
   return {
-      date: sheet.getRange(positions.date).getDisplayValue(),
-      pricePerPiece: sheet.getRange(positions.pricePerPiece).getDisplayValue(),
-      receiver: sheet.getRange(positions.receiver).getDisplayValue(),
-      account: sheet.getRange(positions.account).getDisplayValue(),
-      phone: sheet.getRange(positions.phone).getDisplayValue(),
+      pricePerPiece: rows.pricePerPiece.getDisplayValue(),
+      servicePrice: rows.servicePrice.getDisplayValue(),
+      receiver: rows.receiver.getDisplayValue(),
+      account: rows.account.getDisplayValue(),
+      phone: rows.phone.getDisplayValue(),
+      date: rows.date.getDisplayValue(),
   };
 }
 
 function showPrintDialog() {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = spreadsheet.getActiveSheet();
+  const commonData = getCommonData(sheet);
 
-  if (sheet.getRange('K13').getDisplayValue() === cannotCalculateText) {
+  if (commonData.pricePerPiece === cannotCalculateText) {
     spreadsheet.toast('Niektóre pola nie są uzupełnione', 'Nie można drukować', 3);
     return;
   }
@@ -93,7 +116,6 @@ function showPrintDialog() {
     .createTemplateFromFile("PrintPrompt");
   template.sheetData = getCommonData(sheet);
   template.people = listPeople(sheet);
-  // SpreadsheetApp.getUi().showSidebar(template.evaluate());
   SpreadsheetApp.getUi().showModalDialog(template.evaluate(), "Print receipt");
 }
 

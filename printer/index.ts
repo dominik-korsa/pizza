@@ -3,12 +3,15 @@ import {connectWebsocket} from "./sockets";
 const {openDevice, printer, printQrImage} = require("./wrapper");
 
 export interface ReceiptData {
-    date: string;
     personName: string;
-    pricePerPiece: string;
     pieces: number;
+    piecesPrice: string;
     totalPrice: string;
     qrContent: string;
+
+    date: string;
+    pricePerPiece: string;
+    servicePrice: string;
     receiver: string;
     phone: string;
     account: string;
@@ -29,10 +32,22 @@ async function printReceipt(data: ReceiptData) {
         .feed()
         .tableCustom(
             [
-                { text: "Cena:", align:"LEFT", width:0.2 },
-                { text: `${data.pieces} * ${data.pricePerPiece}`, align:"RIGHT", width:0.8, style: 'b' }
-            ]
+                { text: "Kawałki:", align:"LEFT", width:0.25 },
+                { text: `${data.pieces} * ${data.pricePerPiece} =`, align:"RIGHT", width:0.75, style: 'b' }
+            ],
         )
+        .style('b')
+        .align('rt')
+        .text(data.piecesPrice)
+        .style('normal')
+        .tableCustom(
+            [
+                { text: "Opłata dodatkowa:", align:"LEFT", width:0.6 },
+                { text: `${data.servicePrice}`, align:"RIGHT", width:0.4, style: 'b' }
+            ],
+        )
+        .align('lt')
+        .text('Razem:')
         .size(1, 1)
         .align('rt')
         .text(data.totalPrice)
