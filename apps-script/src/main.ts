@@ -7,6 +7,7 @@ import {LodashGS} from "./global";
 const _ = LodashGS.load();
 
 const printRequestUrl = 'https://pizza.dominik-korsa.tk/request-print';
+const isConnectedRequestUrl = 'https://pizza.dominik-korsa.tk/is-connected';
 
 const positions = {
   qrContentTemplate: 'N3',
@@ -102,6 +103,13 @@ function getCommonData(sheet: Sheet): ReceiptDataCommon {
   };
 }
 
+function checkPrinterConnected(): boolean {
+  const response = UrlFetchApp.fetch(isConnectedRequestUrl, {
+    'method' : 'get',
+  });
+  return JSON.parse(response.getContentText());
+}
+
 function showPrintDialog() {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = spreadsheet.getActiveSheet();
@@ -109,6 +117,10 @@ function showPrintDialog() {
 
   if (commonData.pricePerPiece === cannotCalculateText) {
     spreadsheet.toast('Niektóre pola nie są uzupełnione', 'Nie można drukować', 3);
+    return;
+  }
+  if (!checkPrinterConnected()) {
+    spreadsheet.toast('Drukarka nie jest połączona', 'Włącz usługę drukowania na komputerze', 3);
     return;
   }
 
