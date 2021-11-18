@@ -9,6 +9,7 @@ export interface ReceiptDataPerson {
 export interface ReceiptDataCommon {
     date: string;
     pricePerPiece: string;
+    drinksPrice: string;
     servicePrice: string;
     receiver: string;
     phone: string;

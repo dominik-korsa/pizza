@@ -11,6 +11,7 @@ export interface ReceiptData {
 
     date: string;
     pricePerPiece: string;
+    drinksPrice: string;
     servicePrice: string;
     receiver: string;
     phone: string;
@@ -32,17 +33,21 @@ async function printReceipt(data: ReceiptData) {
         .feed()
         .tableCustom(
             [
-                { text: "Kawałki:", align:"LEFT", width:0.25 },
-                { text: `${data.pieces} * ${data.pricePerPiece} =`, align:"RIGHT", width:0.75, style: 'b' }
+                { text: "Kawałki:", align:"LEFT", cols: 9 },
+                { text: `${data.pieces}x ${data.pricePerPiece}`, cols: 11, align:"RIGHT" },
+                { text: data.piecesPrice, align:"RIGHT", cols: 10, style: 'b' },
             ],
         )
-        .style('b')
-        .align('rt')
-        .text(data.piecesPrice)
         .style('normal')
         .tableCustom(
             [
-                { text: "Opłata dodatkowa:", align:"LEFT", width:0.6 },
+                { text: "Napoje:", align:"LEFT", width:0.6 },
+                { text: `${data.drinksPrice}`, align:"RIGHT", width:0.4, style: 'b' }
+            ],
+        )
+        .tableCustom(
+            [
+                { text: "Opłata serwisowa:", align:"LEFT", width:0.6 },
                 { text: `${data.servicePrice}`, align:"RIGHT", width:0.4, style: 'b' }
             ],
         )

@@ -86,8 +86,9 @@ function listPeople(sheet: Sheet): ReceiptDataPerson[] {
 function getCommonData(sheet: Sheet): ReceiptDataCommon {
   const range = sheet.getRange('K1:L');
   const rows = findRows(range, {
-    pricePerPiece: 'Cena za kawałek',
-    servicePrice: 'Cena na osobę',
+    pricePerPiece: 'Opłata za kawałek',
+    drinksPrice: 'Opłata za napoje',
+    servicePrice: 'Opłata serwisowa',
     receiver: 'Odbiorca',
     account: 'Konto bankowe',
     phone: 'Numer telefonu',
@@ -95,6 +96,7 @@ function getCommonData(sheet: Sheet): ReceiptDataCommon {
   });
   return {
       pricePerPiece: rows.pricePerPiece.getDisplayValue(),
+      drinksPrice: rows.drinksPrice.getDisplayValue(),
       servicePrice: rows.servicePrice.getDisplayValue(),
       receiver: rows.receiver.getDisplayValue(),
       account: rows.account.getDisplayValue(),
