@@ -87,8 +87,8 @@ function getCommonData(sheet: Sheet): ReceiptDataCommon {
   const range = sheet.getRange('K1:L');
   const rows = findRows(range, {
     pricePerPiece: 'Opłata za kawałek',
-    drinksPrice: 'Opłata za napoje',
-    servicePrice: 'Opłata serwisowa',
+    drinkFee: 'Opłata za napoje',
+    additionalFee: 'Opłata dodatkowa',
     receiver: 'Odbiorca',
     account: 'Konto bankowe',
     phone: 'Numer telefonu',
@@ -96,8 +96,8 @@ function getCommonData(sheet: Sheet): ReceiptDataCommon {
   });
   return {
       pricePerPiece: rows.pricePerPiece.getDisplayValue(),
-      drinksPrice: rows.drinksPrice.getDisplayValue(),
-      servicePrice: rows.servicePrice.getDisplayValue(),
+      drinkFee: rows.drinkFee.getDisplayValue(),
+      additionalFee: rows.additionalFee.getDisplayValue(),
       receiver: rows.receiver.getDisplayValue(),
       account: rows.account.getDisplayValue(),
       phone: rows.phone.getDisplayValue(),

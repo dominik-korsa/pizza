@@ -11,8 +11,8 @@ export interface ReceiptData {
 
     date: string;
     pricePerPiece: string;
-    drinksPrice: string;
-    servicePrice: string;
+    drinkFee: string;
+    additionalFee: string;
     receiver: string;
     phone: string;
     account: string;
@@ -42,13 +42,13 @@ async function printReceipt(data: ReceiptData) {
         .tableCustom(
             [
                 { text: "Napoje:", align:"LEFT", width:0.6 },
-                { text: `${data.drinksPrice}`, align:"RIGHT", width:0.4, style: 'b' }
+                { text: `${data.drinkFee}`, align:"RIGHT", width:0.4, style: 'b' }
             ],
         )
         .tableCustom(
             [
-                { text: "Opłata serwisowa:", align:"LEFT", width:0.6 },
-                { text: `${data.servicePrice}`, align:"RIGHT", width:0.4, style: 'b' }
+                { text: "Opłata dodatkowa:", align:"LEFT", width:0.6 },
+                { text: `${data.additionalFee}`, align:"RIGHT", width:0.4, style: 'b' }
             ],
         )
         .align('lt')
