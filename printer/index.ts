@@ -87,9 +87,19 @@ async function printReceipt(printer: escpos.Printer, data: ReceiptData) {
 }
 
 async function main() {
-    const printer = await getPrinter();
+    let printer: escpos.Printer;
+    while (true) {
+        try {
+            printer = await getPrinter();
+            break;
+        } catch (error) {
+            if (error instanceof Error) console.log(error.message);
+            else console.error(error);
+            await new Promise((resolve) => setTimeout(resolve, 10000));
+        }
+    }
     const channel = await connectWebsocket();
-    console.log('WebSocket connected');
+    console.log('Connected');
     for await (const msg of channel) {
         await printReceipt(printer, msg);
         console.log('Printed');
