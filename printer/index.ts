@@ -1,6 +1,6 @@
 import {connectWebsocket} from "./sockets";
-
-const {openDevice, printer, printQrImage} = require("./wrapper");
+import {closePrinter, getPrinter, printQrWithLogo} from "./wrapper";
+import escpos from "escpos";
 
 export interface ReceiptData {
     personName: string;
@@ -18,18 +18,21 @@ export interface ReceiptData {
     account: string;
 }
 
-async function printReceipt(data: ReceiptData) {
-    await openDevice();
+async function printReceipt(printer: escpos.Printer, data: ReceiptData) {
     printer
         .encode('cp852')
         .setCharacterCodeTable([18])
-        .font('a')
+        .font('A')
         .size(0, 0)
-        .align('ct')
+        .align('CT')
+        .style('NORMAL')
         .text(`Pizza ${data.date}`)
-        .style('b')
-        .text(data.personName)
-        .style('normal')
+        .tableCustom(
+            [
+                { text: "Dla:", align:"LEFT", width:0.3 },
+                { text: data.personName, align:"RIGHT", width:0.7, style: 'B' }
+            ],
+        )
         .feed()
         .tableCustom(
             [
@@ -38,7 +41,7 @@ async function printReceipt(data: ReceiptData) {
                 { text: data.piecesPrice, align:"RIGHT", cols: 10, style: 'b' },
             ],
         )
-        .style('normal')
+        .style('NORMAL')
         .tableCustom(
             [
                 { text: "Napoje:", align:"LEFT", width:0.6 },
@@ -51,16 +54,16 @@ async function printReceipt(data: ReceiptData) {
                 { text: `${data.additionalFee}`, align:"RIGHT", width:0.4, style: 'b' }
             ],
         )
-        .align('lt')
+        .align('LT')
         .text('Razem:')
         .size(1, 1)
-        .align('rt')
+        .align('RT')
         .text(data.totalPrice)
         .size(0, 0)
         .feed()
         .drawLine('─')
-        .align('ct');
-    await printQrImage(data.qrContent, { type: 'png', mode: 'dhdw', size: 3 });
+        .align('CT');
+    await printQrWithLogo(printer, data.qrContent);
     printer
         .feed()
         .tableCustom([
@@ -71,23 +74,24 @@ async function printReceipt(data: ReceiptData) {
             { text:"BLIK:", align:"LEFT", width:0.4 },
             { text: data.phone, align:"RIGHT", width:0.6, style: 'b' }
         ])
-        .align('lt')
-        .style('normal')
+        .align('LT')
+        .style('NORMAL')
         .text('Przelew:')
-        .align('rt')
-        .style('b')
+        .align('RT')
+        .style('B')
         .text(data.account)
         .feed(2);
-    await printer.close();
+    await closePrinter(printer);
     await new Promise((resolve) => setTimeout(resolve, 2000));
     printer.beep(0, 0);
 }
 
 async function main() {
+    const printer = await getPrinter();
     const channel = await connectWebsocket();
     console.log('WebSocket connected');
     for await (const msg of channel) {
-        await printReceipt(msg);
+        await printReceipt(printer, msg);
         console.log('Printed');
     }
 }
@@ -96,4 +100,3 @@ main().catch((error) => {
     console.error(error);
     process.exit(1);
 })
-
