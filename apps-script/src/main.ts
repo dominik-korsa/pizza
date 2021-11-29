@@ -1,3 +1,5 @@
+// noinspection JSUnusedLocalSymbols
+
 import SpreadsheetApp = GoogleAppsScript.Spreadsheet.SpreadsheetApp;
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 import HtmlService = GoogleAppsScript.HTML.HtmlService;
@@ -19,6 +21,7 @@ function onOpen() {
   ui.createMenu('Pizza')
       // .addItem('Send webhook', 'sendWebhook')
       .addItem('Print receipts', 'showPrintDialog')
+      .addItem('Add person', 'testAddPerson')
       .addToUi();
 }
 
@@ -140,4 +143,37 @@ function onPersonPrint(data: ReceiptData) {
     'contentType': 'application/json',
     'payload' : JSON.stringify(data)
   })
+}
+
+function addPerson(name: string, discordId: string, className: string): 'name-exists' | 'discord-id-exists' | 'added-discord-id' | 'ok' {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = spreadsheet.getSheetByName("Osoby");
+  if (sheet === null) throw new Error('Sheet not found');
+  const range = sheet.getRange("A2:C");
+  const values = range.getValues().map(
+      (el: (string | number | Date)[]) => ({
+        name: el[0].toString().trim(),
+        discordId: el[1].toString().trim(),
+        className: el[2].toString().trim(),
+      }),
+  );
+  if (values.some((el) => el.discordId === discordId)) return 'discord-id-exists';
+  let rowIndex = values.findIndex(({name: elName}) => elName === name);
+  if (rowIndex === -1) {
+    let row: {name: string, discordId: string, className: string};
+    do {
+      rowIndex += 1;
+      row = values[rowIndex];
+    } while (`${row.name}${row.discordId}${row.className}` !== '')
+    range.getCell(rowIndex + 1, 1).setValue(name);
+    range.getCell(rowIndex + 1, 2).setValue(discordId);
+    range.getCell(rowIndex + 1, 3).setValue(className);
+    console.log(row, rowIndex);
+    return 'ok';
+  }
+  const row = values[rowIndex];
+  if (row.discordId === discordId) return 'name-exists';
+  range.getCell(rowIndex + 1, 2).setValue(discordId);
+  range.getCell(rowIndex + 1, 3).setValue(className);
+  return 'added-discord-id';
 }
