@@ -8,10 +8,12 @@ export interface ReceiptData {
     piecesPrice: string;
     totalPrice: string;
     qrContent: string;
+    ownCup: boolean;
 
     date: string;
     pricePerPiece: string;
     drinkFee: string;
+    cupFee: string;
     additionalFee: string;
     receiver: string;
     phone: string;
@@ -21,7 +23,7 @@ export interface ReceiptData {
 async function printReceipt(printer: escpos.Printer, data: ReceiptData) {
     printer
         .encode('cp852')
-        .setCharacterCodeTable([18])
+        .setCharacterCodeTable(18)
         .font('A')
         .size(0, 0)
         .align('CT')
@@ -50,6 +52,12 @@ async function printReceipt(printer: escpos.Printer, data: ReceiptData) {
         )
         .tableCustom(
             [
+                { text: "Opłata za kubek:", align:"LEFT", width:0.6 },
+                { text: data.ownCup ? '-' : `${data.cupFee}`, align:"RIGHT", width:0.4, style: 'b' }
+            ],
+        )
+        .tableCustom(
+            [
                 { text: "Opłata dodatkowa:", align:"LEFT", width:0.6 },
                 { text: `${data.additionalFee}`, align:"RIGHT", width:0.4, style: 'b' }
             ],
@@ -68,7 +76,7 @@ async function printReceipt(printer: escpos.Printer, data: ReceiptData) {
         .feed()
         .tableCustom([
             { text:"Odbiorca:", align:"LEFT", width:0.4 },
-            { text: data.receiver, align:"RIGHT", width:0.6, style: 'b' }
+            { text: data.receiver, align:"RIGHT", width:0.6, style: 'B' }
         ])
         .tableCustom([
             { text:"BLIK:", align:"LEFT", width:0.4 },

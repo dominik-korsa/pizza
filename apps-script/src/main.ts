@@ -63,10 +63,11 @@ function findRows<T extends Record<string, string>>(range: Range, rows: T): Rows
 
 function listPeople(sheet: Sheet): ReceiptDataPerson[] {
   const columns = findColumns(sheet.getRange('A1:H1'), {
-    name: 'Kto? Kto będzie jadł?',
+    name: 'Imię i nazwisko',
     pieces: 'Kawałki',
     piecesPrice: 'Cena kawałków',
     totalPrice: 'Do zapłaty',
+    ownCup: 'Własny kubek',
   });
   const range = sheet.getRange("A2:H");
   const people: ReceiptDataPerson[] = [];
@@ -79,6 +80,7 @@ function listPeople(sheet: Sheet): ReceiptDataPerson[] {
         pieces: range.getCell(i, columns.pieces).getValue(),
         piecesPrice: range.getCell(i, columns.piecesPrice).getDisplayValue(),
         totalPrice: totalPriceCell.getDisplayValue(),
+        ownCup: range.getCell(i, columns.ownCup).getValue() == "Tak",
         qrContent: sheet.getRange(positions.qrContentTemplate).getValue().replace('{price}', zeroPad(Math.round(totalPriceCell.getValue() * 100), 6))
       });
     }
@@ -87,10 +89,11 @@ function listPeople(sheet: Sheet): ReceiptDataPerson[] {
 }
 
 function getCommonData(sheet: Sheet): ReceiptDataCommon {
-  const range = sheet.getRange('K1:L');
+  const range = sheet.getRange('L1:M');
   const rows = findRows(range, {
     pricePerPiece: 'Opłata za kawałek',
     drinkFee: 'Opłata za napoje',
+    cupFee: 'Opłata za kubek',
     additionalFee: 'Opłata dodatkowa',
     receiver: 'Odbiorca',
     account: 'Konto bankowe',
@@ -100,6 +103,7 @@ function getCommonData(sheet: Sheet): ReceiptDataCommon {
   return {
       pricePerPiece: rows.pricePerPiece.getDisplayValue(),
       drinkFee: rows.drinkFee.getDisplayValue(),
+      cupFee: rows.cupFee.getDisplayValue(),
       additionalFee: rows.additionalFee.getDisplayValue(),
       receiver: rows.receiver.getDisplayValue(),
       account: rows.account.getDisplayValue(),
