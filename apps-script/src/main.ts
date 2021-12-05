@@ -12,7 +12,7 @@ const printRequestUrl = 'https://pizza.dominik-korsa.tk/request-print';
 const isConnectedRequestUrl = 'https://pizza.dominik-korsa.tk/is-connected';
 
 const positions = {
-  qrContentTemplate: 'N3',
+  qrContentTemplate: 'O3',
 };
 const cannotCalculateText = 'Nie można obliczyć';
 
@@ -62,14 +62,14 @@ function findRows<T extends Record<string, string>>(range: Range, rows: T): Rows
 }
 
 function listPeople(sheet: Sheet): ReceiptDataPerson[] {
-  const columns = findColumns(sheet.getRange('A1:H1'), {
+  const range = sheet.getRange('A1:j');
+  const columns = findColumns(range, {
     name: 'Imię i nazwisko',
     pieces: 'Kawałki',
     piecesPrice: 'Cena kawałków',
     totalPrice: 'Do zapłaty',
     ownCup: 'Własny kubek',
   });
-  const range = sheet.getRange("A2:H");
   const people: ReceiptDataPerson[] = [];
   for (let i = 2; i <= range.getHeight(); ++i) {
     const personName = range.getCell(i, columns.name).getDisplayValue();
@@ -172,7 +172,6 @@ function addPerson(name: string, discordId: string, className: string): 'name-ex
     range.getCell(rowIndex + 1, 1).setValue(name);
     range.getCell(rowIndex + 1, 2).setValue(discordId);
     range.getCell(rowIndex + 1, 3).setValue(className);
-    console.log(row, rowIndex);
     return 'ok';
   }
   const row = values[rowIndex];
