@@ -63,7 +63,7 @@ function findRows<T extends Record<string, string>>(range: Range, rows: T): Rows
   }));
 }
 
-function listPeople(sheet: Sheet): ReceiptDataPerson[] {
+function findOrderColumns(sheet: Sheet) {
   const range = sheet.getRange(positions.data);
   const columns = findColumns(range, {
     name: 'Imię i nazwisko',
@@ -72,6 +72,11 @@ function listPeople(sheet: Sheet): ReceiptDataPerson[] {
     totalPrice: 'Do zapłaty',
     drink: 'Napój',
   });
+  return {range, columns};
+}
+
+function listOrders(sheet: Sheet): ReceiptDataPerson[] {
+  const {range, columns} = findOrderColumns(sheet);
   const people: ReceiptDataPerson[] = [];
   for (let i = 2; i <= range.getHeight(); ++i) {
     const personName = range.getCell(i, columns.name).getDisplayValue();
@@ -154,7 +159,7 @@ function showPrintDialog() {
   const template = HtmlService
     .createTemplateFromFile("PrintPrompt");
   template.sheetData = getCommonData(sheet);
-  template.people = listPeople(sheet);
+  template.people = listOrders(sheet);
   SpreadsheetApp.getUi().showModalDialog(template.evaluate(), "Print receipt");
 }
 
@@ -167,7 +172,13 @@ function onPersonPrint(data: ReceiptData) {
   })
 }
 
-function addPerson(name: string, discordId: string, className: string): 'name-exists' | 'discord-id-exists' | 'added-discord-id' | 'ok' {
+interface Person {
+  name: string,
+  discordId: string,
+  className: string,
+}
+
+function getPeople(): {values: Person[], range: Range} {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = spreadsheet.getSheetByName("Osoby");
   if (sheet === null) throw new Error('Sheet not found');
@@ -179,6 +190,11 @@ function addPerson(name: string, discordId: string, className: string): 'name-ex
         className: el[2].toString().trim(),
       }),
   );
+  return {range, values};
+}
+
+function addPerson(name: string, discordId: string, className: string): 'name-exists' | 'discord-id-exists' | 'added-discord-id' | 'ok' {
+  const {values, range} = getPeople();
   if (values.some((el) => el.discordId === discordId)) return 'discord-id-exists';
   let rowIndex = values.findIndex(({name: elName}) => elName === name);
   if (rowIndex === -1) {
@@ -197,4 +213,33 @@ function addPerson(name: string, discordId: string, className: string): 'name-ex
   range.getCell(rowIndex + 1, 2).setValue(discordId);
   range.getCell(rowIndex + 1, 3).setValue(className);
   return 'added-discord-id';
+}
+
+function getPersonByDiscordId(discordId: string): Person | null {
+  const {values} = getPeople();
+  return values.find((person) => person.discordId === discordId) ?? null;
+}
+
+function getSpreadsheetOfToday(): Sheet | null {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  return spreadsheet.getSheetByName(new Date().toISOString().split("T")[0]);
+}
+
+function order(discordId: string, drink: string): 'no-spreadsheet' | 'unknown-user' | 'ok' {
+  const person = getPersonByDiscordId(discordId);
+  if (person === null) return 'unknown-user';
+  const sheet = getSpreadsheetOfToday();
+  if (sheet === null) return 'no-spreadsheet';
+  console.log(sheet.getSheetName());
+
+  const orders = listOrders(sheet);
+  let index = orders.findIndex((order) => order.personName === person.name) + 1;
+  const {range, columns} = findOrderColumns(sheet);
+  if (index === 0) {
+    index = 1;
+    while (range.getCell(index + 1, columns.name).getValue() !== '') ++index;
+    range.getCell(index + 1, columns.name).setValue(person.name);
+  }
+  range.getCell(index + 1, columns.drink).setValue(drink);
+  return 'ok';
 }

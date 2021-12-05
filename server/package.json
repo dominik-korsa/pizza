@@ -2,16 +2,25 @@
   "name": "pizza-receipt-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "start": "node .",
+    "start": "ts-node .",
+    "start:ignore": "ts-node --transpile-only .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "@types/node": "^16.11.10",
+    "discord-slash-commands-client": "^1.2.2",
+    "discord.js": "^13.3.1",
+    "dotenv": "^10.0.0",
     "fastify": "^3.24.0",
-    "fastify-websocket": "^4.0.0"
+    "fastify-websocket": "^4.0.0",
+    "googleapis": "^91.0.0",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
   }
 }
