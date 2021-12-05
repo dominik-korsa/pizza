@@ -111,3 +111,23 @@ export async function complete(discordId: string, pieces: number): Promise<Compl
         return {code: 'error'};
     }
 }
+
+export async function printByDiscordId(discordId: string): Promise<boolean> {
+    try {
+        const script = google.script('v1');
+        const response = await script.scripts.run({
+            auth: client,
+            scriptId: requireEnv('GOOGLE_SCRIPT_ID'),
+            requestBody: {
+                // devMode: true,
+                function: 'printByDiscordId',
+                parameters: [discordId],
+            },
+        });
+        if (response.data.error) return false;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+    return true;
+}

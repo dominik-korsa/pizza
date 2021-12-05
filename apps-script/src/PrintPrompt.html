@@ -8,10 +8,15 @@
         alert(error);
       }
 
+      function onSuccess(canPrint) {
+        if (canPrint) {
+          document.getElementById(`check-${i}`).classList.add('check--visible');
+        }
+      }
+
       function printPerson(i, stringified) {
         const data = JSON.parse(decodeURIComponent(stringified));
-        google.script.run.withFailureHandler(onFailure).onPersonPrint(data);
-        document.getElementById(`check-${i}`).classList.add('check--visible');
+        google.script.run.withFailureHandler(onFailure).withSuccessHandler(onSuccess).onPersonPrint(data);
       }
     </script>
     <style>

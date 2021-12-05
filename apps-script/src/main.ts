@@ -164,12 +164,32 @@ function showPrintDialog() {
 }
 
 function onPersonPrint(data: ReceiptData) {
+  if (data.totalPrice === '') {
+    SpreadsheetApp.getActive().toast("Nie można wydrukować");
+    return false;
+  }
   SpreadsheetApp.getActive().toast("Printing person");
   UrlFetchApp.fetch(printRequestUrl, {
     'method' : 'post',
     'contentType': 'application/json',
     'payload' : JSON.stringify(data)
-  })
+  });
+  return true;
+}
+
+function printByDiscordId(discordId: string) {
+  const person = getPersonByDiscordId(discordId);
+  if (person === null) throw new Error('Unknown Discord id');
+  const sheet = getSpreadsheetOfToday();
+  if (sheet === null) throw new Error('Cannot find today\'s spreadsheet');
+
+  const commonData = getCommonData(sheet);
+  const orders = listOrders(sheet);
+  let order = orders.find((order) => order.personName === person.name);
+  if (order === undefined) throw new Error('Cannot find order');
+
+  if (!checkPrinterConnected()) throw new Error('Printer not connected');
+  if (!onPersonPrint({...commonData, ...order})) throw new Error('Cannot print');
 }
 
 interface Person {
