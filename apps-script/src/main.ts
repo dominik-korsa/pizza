@@ -12,7 +12,9 @@ const printRequestUrl = 'https://pizza.dominik-korsa.tk/request-print';
 const isConnectedRequestUrl = 'https://pizza.dominik-korsa.tk/is-connected';
 
 const positions = {
-  qrContentTemplate: 'O3',
+  qrContentTemplate: 'P3',
+  data: 'A1:K',
+  summary: 'M1:N',
 };
 const cannotCalculateText = 'Nie można obliczyć';
 
@@ -62,25 +64,37 @@ function findRows<T extends Record<string, string>>(range: Range, rows: T): Rows
 }
 
 function listPeople(sheet: Sheet): ReceiptDataPerson[] {
-  const range = sheet.getRange('A1:j');
+  const range = sheet.getRange(positions.data);
   const columns = findColumns(range, {
     name: 'Imię i nazwisko',
     pieces: 'Kawałki',
     piecesPrice: 'Cena kawałków',
     totalPrice: 'Do zapłaty',
-    ownCup: 'Własny kubek',
+    drink: 'Napój',
   });
   const people: ReceiptDataPerson[] = [];
   for (let i = 2; i <= range.getHeight(); ++i) {
     const personName = range.getCell(i, columns.name).getDisplayValue();
     if (personName !== '') {
       const totalPriceCell = range.getCell(i, columns.totalPrice);
+      let drink: 'own-cup' | 'single-use-cup' | null;
+      switch (range.getCell(i, columns.drink).getValue()) {
+        case 'Własny kubek':
+          drink = 'own-cup';
+          break;
+        case 'Jednorazowy kubek':
+          drink = 'single-use-cup';
+          break;
+        default:
+          drink = null;
+          break;
+      }
       people.push({
         personName,
         pieces: range.getCell(i, columns.pieces).getValue(),
         piecesPrice: range.getCell(i, columns.piecesPrice).getDisplayValue(),
         totalPrice: totalPriceCell.getDisplayValue(),
-        ownCup: range.getCell(i, columns.ownCup).getValue() == "Tak",
+        drink,
         qrContent: sheet.getRange(positions.qrContentTemplate).getValue().replace('{price}', zeroPad(Math.round(totalPriceCell.getValue() * 100), 6))
       });
     }
@@ -89,7 +103,7 @@ function listPeople(sheet: Sheet): ReceiptDataPerson[] {
 }
 
 function getCommonData(sheet: Sheet): ReceiptDataCommon {
-  const range = sheet.getRange('L1:M');
+  const range = sheet.getRange(positions.summary);
   const rows = findRows(range, {
     pricePerPiece: 'Opłata za kawałek',
     drinkFee: 'Opłata za napoje',
@@ -125,7 +139,11 @@ function showPrintDialog() {
   const commonData = getCommonData(sheet);
 
   if (commonData.pricePerPiece === cannotCalculateText) {
-    spreadsheet.toast('Niektóre pola nie są uzupełnione', 'Nie można drukować', 3);
+    spreadsheet.toast('Nie można obliczyć ceny za kawałek', 'Nie można drukować', 3);
+    return;
+  }
+  if (commonData.drinkFee === cannotCalculateText) {
+    spreadsheet.toast('Nie można obliczyć opłaty za napoje', 'Nie można drukować', 3);
     return;
   }
   if (!checkPrinterConnected()) {

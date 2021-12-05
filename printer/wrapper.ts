@@ -25,9 +25,9 @@ export function openDevice(device: escpos.Adapter): Promise<void> {
     })
 }
 
-export function closePrinter(printer: escpos.Printer): Promise<void> {
+export function flushPrinter(printer: escpos.Printer): Promise<void> {
     return new Promise((resolve, reject) => {
-        printer.close((error) => {
+        printer.flush((error) => {
             if (error) reject(error);
             else resolve();
         });

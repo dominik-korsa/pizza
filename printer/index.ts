@@ -1,5 +1,5 @@
 import {connectWebsocket} from "./sockets";
-import {closePrinter, getPrinter, printQrWithLogo} from "./wrapper";
+import {flushPrinter, getPrinter, printQrWithLogo} from "./wrapper";
 import escpos from "escpos";
 
 export interface ReceiptData {
@@ -8,7 +8,7 @@ export interface ReceiptData {
     piecesPrice: string;
     totalPrice: string;
     qrContent: string;
-    ownCup: boolean;
+    drink: 'own-cup' | 'single-use-cup' | null;
 
     date: string;
     pricePerPiece: string;
@@ -47,15 +47,18 @@ async function printReceipt(printer: escpos.Printer, data: ReceiptData) {
         .tableCustom(
             [
                 { text: "Napoje:", align:"LEFT", width:0.6 },
-                { text: `${data.drinkFee}`, align:"RIGHT", width:0.4, style: 'b' }
+                { text: data.drink === null ? '-' : `${data.drinkFee}`, align:"RIGHT", width:0.4, style: 'b' }
             ],
-        )
-        .tableCustom(
+        );
+    if (data.drink !== null) {
+        printer.tableCustom(
             [
                 { text: "Opłata za kubek:", align:"LEFT", width:0.6 },
-                { text: data.ownCup ? '-' : `${data.cupFee}`, align:"RIGHT", width:0.4, style: 'b' }
+                { text: data.drink === 'own-cup' ? '-' : `${data.cupFee}`, align:"RIGHT", width:0.4, style: 'b' }
             ],
-        )
+        );
+    }
+    printer
         .tableCustom(
             [
                 { text: "Opłata dodatkowa:", align:"LEFT", width:0.6 },
@@ -89,9 +92,8 @@ async function printReceipt(printer: escpos.Printer, data: ReceiptData) {
         .style('B')
         .text(data.account)
         .feed(2);
-    await closePrinter(printer);
+    await flushPrinter(printer);
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    printer.beep(0, 0);
 }
 
 async function main() {

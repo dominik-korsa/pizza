@@ -4,7 +4,7 @@ export interface ReceiptDataPerson {
     piecesPrice: string;
     totalPrice: string;
     qrContent: string;
-    ownCup: boolean;
+    drink: 'own-cup' | 'single-use-cup' | null;
 }
 
 export interface ReceiptDataCommon {
