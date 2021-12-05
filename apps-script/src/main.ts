@@ -230,7 +230,6 @@ function order(discordId: string, drink: string): 'no-spreadsheet' | 'unknown-us
   if (person === null) return 'unknown-user';
   const sheet = getSpreadsheetOfToday();
   if (sheet === null) return 'no-spreadsheet';
-  console.log(sheet.getSheetName());
 
   const orders = listOrders(sheet);
   let index = orders.findIndex((order) => order.personName === person.name) + 1;
@@ -242,4 +241,21 @@ function order(discordId: string, drink: string): 'no-spreadsheet' | 'unknown-us
   }
   range.getCell(index + 1, columns.drink).setValue(drink);
   return 'ok';
+}
+
+function complete(
+    discordId: string,
+    pieces: number,
+): {code: 'no-spreadsheet' | 'unknown-user' | 'no-order'} | {code: 'ok', totalPrice: string} {
+  const person = getPersonByDiscordId(discordId);
+  if (person === null) return {code: 'unknown-user'};
+  const sheet = getSpreadsheetOfToday();
+  if (sheet === null) return {code: 'no-spreadsheet'};
+
+  const orders = listOrders(sheet);
+  let index = orders.findIndex((order) => order.personName === person.name) + 1;
+  const {range, columns} = findOrderColumns(sheet);
+  if (index === 0) return {code: 'no-order'};
+  range.getCell(index + 1, columns.pieces).setValue(pieces);
+  return {code: 'ok', totalPrice: range.getCell(index+1, columns.totalPrice).getDisplayValue()};
 }

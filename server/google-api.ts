@@ -89,3 +89,25 @@ export async function order(discordId: string, drink: string): Promise<OrderResu
         return 'error';
     }
 }
+
+export type CompleteResultError = {code: 'error' | 'no-spreadsheet' | 'unknown-user' | 'no-order'};
+export type CompleteResultOk = {code: 'ok', totalPrice: string};
+export async function complete(discordId: string, pieces: number): Promise<CompleteResultError | CompleteResultOk> {
+    try {
+        const script = google.script('v1');
+        const response = await script.scripts.run({
+            auth: client,
+            scriptId: requireEnv('GOOGLE_SCRIPT_ID'),
+            requestBody: {
+                // devMode: true,
+                function: 'complete',
+                parameters: [discordId, pieces],
+            },
+        });
+        if (response.data.error) return {code: 'error'};
+        return response.data.response?.result as {code: 'no-spreadsheet' | 'unknown-user' | 'no-order'} | {code: 'ok', totalPrice: string};
+    } catch (error) {
+        console.error(error);
+        return {code: 'error'};
+    }
+}

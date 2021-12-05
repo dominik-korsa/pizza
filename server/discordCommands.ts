@@ -50,4 +50,18 @@ export async function registerDiscordCommands() {
             },
         ]
     }, guildId);
+
+    await slashCommandClient.createCommand({
+        name: 'complete',
+        description: 'Zakończ zamówienie przez dodanie liczby zjedzonych kawałków',
+        options: [
+            {
+                name: 'pieces',
+                description: 'Liczba kawałków',
+                type: 4,
+                min_value: 1, // see https://github.com/MatteZ02/discord-interactions/issues/23
+                required: true,
+            },
+        ]
+    }, guildId);
 }
