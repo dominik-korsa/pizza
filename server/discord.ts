@@ -85,7 +85,7 @@ export async function startDiscord() {
                 if (await printByDiscordId(interaction.member.user.id)) {
                     await interaction.followUp({
                         ephemeral: true,
-                        content: ':white_check_mark: Wydrukowan'
+                        content: ':white_check_mark: Wydrukowano'
                     });
                 } else {
                     await interaction.followUp({
