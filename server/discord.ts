@@ -13,6 +13,7 @@ export async function startDiscord() {
     const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
     client.on('interactionCreate', async (interaction) => {
+        if (interaction.member === null) return;
         if (interaction.isCommand()) {
             if (interaction.commandName === 'link') {
                 await interaction.deferReply({ephemeral: true});
