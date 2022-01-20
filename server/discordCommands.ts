@@ -60,7 +60,7 @@ export async function registerDiscordCommands() {
                 description: 'Liczba kawałków',
                 type: 4,
                 // @ts-ignore
-                min_value: 1, // see https://github.com/MatteZ02/discord-interactions/issues/23
+                min_value: 0, // see https://github.com/MatteZ02/discord-interactions/issues/23
                 required: true,
             },
         ]

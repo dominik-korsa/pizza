@@ -12,9 +12,9 @@ const printRequestUrl = 'https://pizza.dominik-korsa.tk/request-print';
 const isConnectedRequestUrl = 'https://pizza.dominik-korsa.tk/is-connected';
 
 const positions = {
-  qrContentTemplate: 'P3',
-  data: 'A1:K',
-  summary: 'M1:N',
+  qrContentTemplate: 'Q3',
+  data: 'A1:J',
+  summary: 'N1:O',
 };
 const cannotCalculateText = 'Nie można obliczyć';
 
@@ -69,6 +69,7 @@ function findOrderColumns(sheet: Sheet) {
     name: 'Imię i nazwisko',
     pieces: 'Kawałki',
     piecesPrice: 'Cena kawałków',
+    additionalFee: 'Opłata dodatkowa',
     totalPrice: 'Do zapłaty',
     drink: 'Napój',
   });
@@ -98,6 +99,7 @@ function listOrders(sheet: Sheet): ReceiptDataPerson[] {
         personName,
         pieces: range.getCell(i, columns.pieces).getValue(),
         piecesPrice: range.getCell(i, columns.piecesPrice).getDisplayValue(),
+        additionalFee: range.getCell(i, columns.additionalFee).getDisplayValue(),
         totalPrice: totalPriceCell.getDisplayValue(),
         drink,
         qrContent: sheet.getRange(positions.qrContentTemplate).getValue().replace('{price}', zeroPad(Math.round(totalPriceCell.getValue() * 100), 6))
@@ -113,7 +115,6 @@ function getCommonData(sheet: Sheet): ReceiptDataCommon {
     pricePerPiece: 'Opłata za kawałek',
     drinkFee: 'Opłata za napoje',
     cupFee: 'Opłata za kubek',
-    additionalFee: 'Opłata dodatkowa',
     receiver: 'Odbiorca',
     account: 'Konto bankowe',
     phone: 'Numer telefonu',
@@ -123,7 +124,6 @@ function getCommonData(sheet: Sheet): ReceiptDataCommon {
       pricePerPiece: rows.pricePerPiece.getDisplayValue(),
       drinkFee: rows.drinkFee.getDisplayValue(),
       cupFee: rows.cupFee.getDisplayValue(),
-      additionalFee: rows.additionalFee.getDisplayValue(),
       receiver: rows.receiver.getDisplayValue(),
       account: rows.account.getDisplayValue(),
       phone: rows.phone.getDisplayValue(),
