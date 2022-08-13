@@ -6,10 +6,10 @@ services:
       - default
     labels:
       - traefik.enable=true
-      - traefik.http.routers.pizza-http.rule=Host(`pizza.dominik-korsa.tk`)
+      - traefik.http.routers.pizza-http.rule=Host(`pizza.dk-gl.eu`)
       - traefik.http.routers.pizza-http.entrypoints=http
       - traefik.http.routers.pizza-http.middlewares=redirect
-      - traefik.http.routers.pizza-https.rule=Host(`pizza.dominik-korsa.tk`)
+      - traefik.http.routers.pizza-https.rule=Host(`pizza.dk-gl.eu`)
       - traefik.http.routers.pizza-https.entrypoints=https
       - traefik.http.routers.pizza-https.tls=true
       - traefik.http.routers.pizza-https.tls.certresolver=letsencrypt
