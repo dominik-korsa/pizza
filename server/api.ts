@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import FastifyWebsocket from "fastify-websocket";
+import FastifyWebsocket from "@fastify/websocket";
 import {WebSocket} from 'ws';
 import {generateAuthUrl, handleGoogleCallback} from "./google-api";
 
