@@ -7,7 +7,10 @@ const fastify = Fastify({ logger: true });
 fastify.register(FastifyWebsocket)
 
 fastify.post('/request-print', async (request, reply) => {
-    sockets.forEach((socket) => socket.send(JSON.stringify(request.body)));
+    sockets.forEach((socket) => {
+        console.log(socket, socket.readyState);
+        socket.send(JSON.stringify(request.body))
+    });
     reply.status(200).send();
 });
 
