@@ -20,7 +20,9 @@ const sockets = new Set<WebSocket>();
 
 fastify.get('/ws', { websocket: true }, (connection) => {
     sockets.add(connection.socket);
+    console.log('Printer connection started', connection.socket)
     connection.socket.on('close', () => {
+        console.log('Printer connection closed', connection.socket);
         sockets.delete(connection.socket);
     })
 });
