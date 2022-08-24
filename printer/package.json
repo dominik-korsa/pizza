@@ -17,6 +17,7 @@
     "@types/qr-image": "^3.2.4",
     "@types/sharp": "^0.29.4",
     "@types/ws": "^8.2.0",
+    "bluetooth-classic-serialport-client": "^0.1.25",
     "escpos": "^3.0.0-alpha.6",
     "escpos-usb": "^3.0.0-alpha.4",
     "get-pixels": "^3.3.3",

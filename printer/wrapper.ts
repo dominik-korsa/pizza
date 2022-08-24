@@ -1,12 +1,12 @@
 import escpos, {Image} from "escpos";
 import qr from "qr-image";
 import getPixels from 'get-pixels';
-import EscposUsb from "escpos-usb";
+import BluetoothAdapter from "./adapter";
 import sharp from 'sharp';
 import * as util from "util";
 
 export async function getPrinter() {
-    const device = new EscposUsb();
+    const device = new BluetoothAdapter();
     const printer = new escpos.Printer(device, {
         width: 32
     } as {});
