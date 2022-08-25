@@ -21,6 +21,7 @@
     "escpos": "^3.0.0-alpha.6",
     "escpos-usb": "^3.0.0-alpha.4",
     "get-pixels": "^3.3.3",
+    "node-bluetooth-serial-port": "^2.2.7",
     "qr-image": "^3.2.0",
     "queueable": "^4.1.4",
     "sharp": "^0.29.1",

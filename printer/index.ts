@@ -101,6 +101,7 @@ async function main() {
     while (true) {
         try {
             printer = await getPrinter();
+            console.log('Printer ready!');
             break;
         } catch (error) {
             if (error instanceof Error) console.log(error.message);

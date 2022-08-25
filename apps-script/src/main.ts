@@ -8,8 +8,8 @@ import Range = GoogleAppsScript.Spreadsheet.Range;
 import {LodashGS} from "./global";
 const _ = LodashGS.load();
 
-const printRequestUrl = 'https://pizza.dominik-korsa.tk/request-print';
-const isConnectedRequestUrl = 'https://pizza.dominik-korsa.tk/is-connected';
+const printRequestUrl = 'https://pizza.dk-gl.eu/request-print';
+const isConnectedRequestUrl = 'https://pizza.dk-gl.eu/is-connected';
 
 const positions = {
   qrContentTemplate: 'Q3',
