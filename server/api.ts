@@ -18,7 +18,7 @@ fastify.get('/is-connected', async () => sockets.size > 0);
 
 const sockets = new Set<WebSocket>();
 
-fastify.get('/ws', { websocket: true }, (connection) => {
+fastify.get('/ws', { websocket: true }, async (connection) => {
     sockets.add(connection.socket);
     console.log('Printer connection started', connection.socket)
     connection.socket.on('close', () => {
