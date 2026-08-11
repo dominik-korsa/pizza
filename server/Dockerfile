@@ -5,4 +5,4 @@ RUN cd /tmp/app && npm install
 RUN mv /tmp/app/node_modules /app
 COPY . /app
 EXPOSE 80
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "start:ignore"]
